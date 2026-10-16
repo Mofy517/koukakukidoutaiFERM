@@ -1,0 +1,139 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#182b45"><title>攻殻機動隊 設定判別 - フェルミ推定あり</title><style>
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#f4f6f8;color:#17202a;line-height:1.5}
+header{background:#182b45;color:white;padding:22px 16px}header h1{font-size:1.35rem;margin:0 0 6px}header p{margin:0;color:#d9e5f3}
+main{max-width:900px;margin:auto;padding:14px}section,.result{background:white;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #17202a0d}
+h2{font-size:1.08rem;margin:0 0 12px}h3{font-size:1rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label{font-size:.9rem;display:block;font-weight:600}input,select{display:block;width:100%;margin-top:5px;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font:inherit;background:white}
+button{border:0;border-radius:10px;padding:14px 18px;background:#1465bd;color:white;font-weight:700;font-size:1rem;width:100%;cursor:pointer}
+.note{font-size:.82rem;color:#596579}.barrow{display:grid;grid-template-columns:58px 1fr 56px;gap:8px;align-items:center;margin:9px 0;font-size:.9rem}.bar{height:12px;border-radius:9px;background:#e7edf4;overflow:hidden}.bar i{display:block;height:100%;background:#3478c8}
+footer{font-size:.8rem;color:#586579;padding:10px 4px 30px}a{color:#125eb2}
+</style></head>
+<body data-mode="fermi"><header><h1>スマスロ 攻殻機動隊 設定判別</h1><p>フェルミ推定あり｜公表値を使って期待回数を推定し、ポアソン/二項近似尤度を比較します。</p></header><main>
+<div class="result"><b>使い方</b><p>分かる項目だけ入力して「設定を推測」。同じプレイ範囲のデータを使い、対象回数と当選回数をセットで入力してください。</p></div>
+
+<section><h2>基本データ</h2><div class="grid">
+<label>通常時などの総消化G数<input id="games" type="number" min="0" placeholder="例：6000"></label>
+<label>CZ初当たり回数<input id="cz" type="number" min="0" placeholder="回数"></label>
+<label>AT初当たり回数<input id="at" type="number" min="0" placeholder="回数"></label>
+</div><p class="note">CZ/ATの分母に対応するゲーム数を入力。可能なら通常時ゲーム数を使用し、集計範囲を統一してください。</p></section>
+<section><h2>設定差のある抽選</h2><div class="grid">
+<label>タチコマCZ対象到達回数<input id="ta" type="number" min="0" placeholder="200G/400G到達"></label>
+<label>タチコマCZ当選回数<input id="th" type="number" min="0" placeholder="当選回数"></label>
+<label>AT当選回数（ストック抽選機会）<input id="ac" type="number" min="0"></label>
+<label>ストック1個当選回数<input id="sh1" type="number" min="0"></label>
+<label>ストック2個当選回数<input id="sh2" type="number" min="0"></label>
+<label>設定変更/AT後の観測回数<input id="supn" type="number" min="0"></label>
+<label>超高確移行確認回数<input id="suph" type="number" min="0"></label>
+<label>CZ失敗後など視覚HACK対象回数<input id="visn" type="number" min="0"></label>
+<label>視覚HACK発生回数<input id="vish" type="number" min="0"></label>
+</div><p class="note">不明な項目は空欄でOK。発生しなかったことを確認できた場合のみ「0」を入力。</p></section>
+<section><h2>殲滅ゾーン（任意）</h2><div class="grid">
+<label>青マス発展回数<input id="bluen" type="number" min="0"></label><label>青マスCZ以上当選回数<input id="blueh" type="number" min="0"></label>
+<label>緑マス発展回数<input id="greenn" type="number" min="0"></label><label>緑マスCZ以上当選回数<input id="greenh" type="number" min="0"></label>
+<label>赤マス発展回数<input id="redn" type="number" min="0"></label><label>赤マスCZ以上当選回数<input id="redh" type="number" min="0"></label>
+</div><h3>白～紫マス発展経由のAT</h3><div class="grid"><label>白～紫マス経由AT当選回数<input id="whiteh" type="number" min="0"></label><label>対象総ゲーム数（上の基本データを使用）<input type="text" value="基本データの総消化G数" disabled></label></div><p class="note">公開値は白～紫マス経由ATの発生確率をゲーム数分母で掲載（1/10676.6～1/4473.0）。ハイパー、リールロック2段階弱レア小役、ロングフリーズ、天井によるATは除外してください。色別救済条件にも注意。</p><p class="note">青・緑・赤マスは救済機能発動時など、解析上の除外条件に該当するサンプルを含めないでください。</p></section>
+<section><h2>終了画面・一枚絵（タイミング別）</h2><p class="note">各欄にはそのタイミングで見た画面の回数を入力。示唆の出現率は公表されていないため、強い示唆は設定制約、弱い示唆は控えめな加点として扱います。モード示唆だけの画面は設定推測に直接加点しません。</p><h3>CZ終了画面</h3><div class="grid"></div><div class="grid"><label>青空＋公安9課（設定2以上）<input id="czscr2" type="number" min="0"></label><label>オペ子（奇数示唆）<input id="czodd" type="number" min="0"></label><label>タチコマ（偶数示唆）<input id="czeven" type="number" min="0"></label><label>トグサ（高設定示唆・弱）<input id="czweak" type="number" min="0"></label><label>イシカワ（高設定示唆・強）<input id="czstrong" type="number" min="0"></label><label>素子（設定1・4・5・6＋高設定示唆強）<input id="czmotoko" type="number" min="0"></label><label>バカンス（設定4以上）<input id="cz4" type="number" min="0"></label><label>全員集合（設定6）<input id="cz6" type="number" min="0"></label></div><h3>CZ終了後PUSHの一枚絵</h3><div class="grid"><label>素子＆タチコマ（高設定示唆・弱）<input id="pushweak" type="number" min="0"></label><label>トグサ（奇数示唆）<input id="pushodd" type="number" min="0"></label><label>バトー（偶数示唆）<input id="pusheven" type="number" min="0"></label><label>アオイ（設定4以上）<input id="push4" type="number" min="0"></label></div><h3>AT終了画面</h3><div class="grid"><label>素子＆タチコマ（高設定示唆・弱）<input id="atweak" type="number" min="0"></label><label>トグサ（奇数示唆）<input id="atodd" type="number" min="0"></label><label>バトー（偶数示唆）<input id="ateven" type="number" min="0"></label><label>アオイ（設定4以上）<input id="at4" type="number" min="0"></label></div><h3>通常時77G以降の裏コマンド一枚絵</h3><div class="grid"><label>素子＆タチコマ（高設定示唆・弱）<input id="77weak" type="number" min="0"></label><label>トグサ（奇数示唆）<input id="77odd" type="number" min="0"></label><label>バトー（偶数示唆）<input id="77even" type="number" min="0"></label><label>アオイ（設定4以上）<input id="774" type="number" min="0"></label></div></section>
+<section><h2>設定示唆</h2><div class="grid">
+<label>最低設定（否定演出など）<select id="minSetting"><option value="1">制約なし</option><option value="2">設定2以上</option><option value="3">設定3以上</option><option value="4">設定4以上</option><option value="5">設定5以上</option><option value="6">設定6</option></select></label>
+<label>サミートロフィー<select id="trophy"><option value="1">未確認/なし</option><option value="2">銅：設定2以上</option><option value="3">銀：設定3以上</option><option value="4">金：設定4以上</option><option value="5">キリン柄：設定5以上</option><option value="6">虹：設定6</option></select></label>
+</div><p class="note">トロフィー等は確認した最も強い示唆を選択。出現率そのものは非公開のため、設定下限の制約として扱います。</p></section>
+<button id="calc">設定を推測</button><div id="result" class="result" aria-live="polite"><h2>推測結果</h2><p>入力後にボタンを押してください。</p></div>
+<footer>参考：なな徹「スマスロ 攻殻機動隊 設定差・設定示唆演出まとめ」（2026/7/6更新）など。数値・演出情報は更新される場合があります。ツールは実設定を保証しません。<br><a href="https://nana-press.com/kaiseki/machine/1096/34843/">解析値の参照元を開く</a></footer></main><script>
+const rates={
+cz:[238.0,236.3,231.7,220.9,214.0,210.1],
+at:[336.3,332.0,319.6,298.7,285.8,278.0],
+tachi:[.300,.329,.375,.417,.458,.483],
+stock:[.033,.046,.058,.071,.083,.096],
+super:[.025,.029,.033,.038,.042,.046],
+visual:[.057,.061,.069,.090,.101,.106],
+blue:[.038,.038,.046,.054,.075,.096],
+green:[.200,.204,.221,.251,.275,.304],
+red:[.550,.554,.567,.585,.604,.617],
+white:[1/10676.6,1/9795.3,1/7732.7,1/6127.5,1/5247.7,1/4473.0]
+};
+const $=id=>document.getElementById(id);
+function n(id){const v=parseFloat($(id).value);return Number.isFinite(v)&&v>=0?v:null}
+function lnFact(k){let s=0;for(let i=2;i<=k;i++)s+=Math.log(i);return s}
+function binomLog(k,n,p){if(k===null||n===null||n<=0||k>n)return 0;k=Math.round(k);n=Math.round(n);return k*Math.log(Math.max(p,1e-12))+(n-k)*Math.log(Math.max(1-p,1e-12))+lnFact(n)-lnFact(k)-lnFact(n-k)}
+function poisLog(k,lambda){if(k===null||lambda===null||lambda<=0)return 0;k=Math.round(k);return k*Math.log(lambda)-lambda-lnFact(k)}
+function run(){
+ let scores=[0,0,0,0,0,0], details=[];
+ const mode=document.body.dataset.mode;
+ const add=(name,obs,expected,fn,desc)=>{
+   if(obs===null||expected===null)return;
+   for(let i=0;i<6;i++){
+    const p=expected(i);
+    if(mode==="fermi") scores[i]+=fn(i,p);
+    else { const scale=Math.max(1,Math.sqrt(Math.abs(p)+1)); scores[i]-=Math.min(12,Math.abs(obs-p)/scale); }
+   }
+   details.push(`${name}: 入力 ${obs} / 設定別期待値を比較。${desc}`);
+ };
+ const games=n('games'), cz=n('cz'), at=n('at');
+ if(games>0&&cz!==null)add('CZ初当たり',cz,i=>games/rates.cz[i],(i,p)=>poisLog(cz,p),'消化G数÷公表CZ分母から期待回数を計算');
+ if(games>0&&at!==null)add('AT初当たり',at,i=>games/rates.at[i],(i,p)=>poisLog(at,p),'消化G数÷公表AT分母から期待回数を計算');
+ const ta=n('ta'), th=n('th');
+ if(ta>0&&th!==null)add('タチコマCZ',th,i=>ta*rates.tachi[i],(i,p)=>binomLog(th,ta,rates.tachi[i]),'対象の200G/400G到達回数を分母にする（白の境界失敗後は除外）');
+ const ac=n('ac'), sh1=n('sh1'), sh2=n('sh2');
+ if(ac>0 && sh1!==null && sh2!==null && sh1+sh2<=ac){
+   for(let i=0;i<6;i++){
+     const p1=[.025,.033,.042,.050,.058,.067][i], p2=[.008,.013,.016,.021,.025,.029][i], p0=1-p1-p2;
+     const zero=Math.max(0,ac-sh1-sh2);
+     if(mode==='fermi') scores[i]+=sh1*Math.log(p1)+sh2*Math.log(p2)+zero*Math.log(p0)+lnFact(ac)-lnFact(sh1)-lnFact(sh2)-lnFact(zero);
+     else { const exp1=ac*p1, exp2=ac*p2; scores[i]-=Math.min(12,Math.abs(sh1-exp1)/Math.sqrt(exp1+1))+Math.min(12,Math.abs(sh2-exp2)/Math.sqrt(exp2+1)); }
+   }
+   details.push(`引き戻しストック個数：機会${ac}回、1個=${sh1}回、2個=${sh2}回、0個=${ac-sh1-sh2}回。設定別の0/1/2個の多項分布で比較。`);
+ }
+ const whiteh=n('whiteh');
+ if(games>0 && whiteh!==null) add('白～紫マス経由AT',whiteh,i=>games*rates.white[i],(i,p)=>poisLog(whiteh,p),'公開値の分母は発展回数ではなくゲーム数。指定の除外契機を除いたAT当選回数を使用');
+ const supn=n('supn'), suph=n('suph');
+ if(supn>0&&suph!==null)add('超高確移行',suph,i=>supn*rates.super[i],(i,p)=>binomLog(suph,supn,rates.super[i]),'設定変更時/AT終了後の観測機会を分母にする');
+ const visn=n('visn'), vish=n('vish');
+ if(visn>0&&vish!==null)add('S.A.M.視覚HACK',vish,i=>visn*rates.visual[i],(i,p)=>binomLog(vish,visn,rates.visual[i]),'CZ失敗後など対象条件の観測機会を分母にする');
+ for(const key of ['blue','green','red']){
+  const den=n(key+'n'), hit=n(key+'h');
+  if(den>0&&hit!==null)add(({blue:'青マス',green:'緑マス',red:'赤マス'})[key],hit,i=>den*rates[key][i],(i,p)=>binomLog(hit,den,rates[key][i]),'色別発展回数を分母にしてCZ以上当選率を比較');
+ }
+
+ // 終了画面は出現率が非公表のため、強示唆は設定下限/候補制約、弱示唆は小さなヒューリスティック加点。
+ const count=id=>n(id)||0;
+ const screens=[
+  ['CZ終了画面・青空＋公安9課','czscr2',s=>s>=2,null,0],
+  ['CZ終了画面・オペ子（奇数）','czodd',null,s=>s%2===1,0.7],['CZ終了画面・タチコマ（偶数）','czeven',null,s=>s%2===0,0.7],
+  ['CZ終了画面・トグサ（高設定弱）','czweak',null,s=>s>=4,0.5],['CZ終了画面・イシカワ（高設定強）','czstrong',null,s=>s>=4,1.2],
+  ['CZ終了画面・素子（設定1/4/5/6）','czmotoko',s=>[1,4,5,6].includes(s),s=>[1,4,5,6].includes(s),0.8],
+  ['CZ終了画面・バカンス','cz4',s=>s>=4,null,0],['CZ終了画面・全員集合','cz6',s=>s===6,null,0],
+  ['CZ後PUSH一枚絵・高設定弱','pushweak',null,s=>s>=4,0.35],['CZ後PUSH一枚絵・トグサ','pushodd',null,s=>s%2===1,0.45],['CZ後PUSH一枚絵・バトー','pusheven',null,s=>s%2===0,0.45],['CZ後PUSH一枚絵・アオイ','push4',s=>s>=4,null,0],
+  ['AT終了画面・高設定弱','atweak',null,s=>s>=4,0.35],['AT終了画面・トグサ','atodd',null,s=>s%2===1,0.45],['AT終了画面・バトー','ateven',null,s=>s%2===0,0.45],['AT終了画面・アオイ','at4',s=>s>=4,null,0],
+  ['77G裏コマンド・高設定弱','77weak',null,s=>s>=4,0.35],['77G裏コマンド・トグサ','77odd',null,s=>s%2===1,0.45],['77G裏コマンド・バトー','77even',null,s=>s%2===0,0.45],['77G裏コマンド・アオイ','774',s=>s>=4,null,0]
+ ];
+ for(const [label,id,hardCondition,scoreCondition,weight] of screens){
+   const c=count(id); if(!c) continue;
+   for(let i=1;i<=6;i++){
+     if(hardCondition && !hardCondition(i)) scores[i-1] = -Infinity;
+     else if(scoreCondition && scoreCondition(i) && Number.isFinite(scores[i-1])) scores[i-1] += weight*c;
+   }
+   details.push(`${label}: ${c}回。出現率非公表のため、強い示唆は候補制約、弱い示唆は控えめな補助評価。`);
+ }
+  const minSetting=parseInt($('minSetting').value||'1',10);
+ const trophy=parseInt($('trophy').value||'1',10);
+ const floor=Math.max(minSetting,trophy);
+ for(let i=0;i<6;i++)if(i+1<floor)scores[i]=-Infinity;
+ if(mode==='fermi'){
+  const max=Math.max(...scores.filter(Number.isFinite));
+  let weights=scores.map(s=>Number.isFinite(s)?Math.exp(Math.max(-700,s-max)):0);
+  const sum=weights.reduce((a,b)=>a+b,0)||1;
+  scores=weights.map(w=>w/sum*100);
+ }else{
+  const finite=scores.filter(Number.isFinite), max=Math.max(...finite);
+  scores=scores.map(s=>Number.isFinite(s)?Math.max(0,100+(s-max)*8):0);
+  const sum=scores.reduce((a,b)=>a+b,0)||1;
+  scores=scores.map(s=>s/sum*100);
+ }
+ const ranking=scores.map((v,i)=>({setting:i+1,v})).sort((a,b)=>b.v-a.v);
+ $('result').innerHTML=`<h2>推測結果</h2><p><b>最有力：設定${ranking[0].setting}</b>（相対スコア ${ranking[0].v.toFixed(1)}%）</p>`+
+ ranking.map(x=>`<div class="barrow"><span>設定${x.setting}</span><div class="bar"><i style="width:${Math.max(0,Math.min(100,x.v))}%"></i></div><b>${x.v.toFixed(1)}%</b></div>`).join('')+
+ `<p class="note">${mode==='fermi'?'※近似尤度を正規化した相対値。厳密な実設定確率ではありません。':'※設定別期待値からの距離を使った簡易スコア。確率ではありません。'}</p>`+
+ `<h3>計算に使った要素</h3><ul>${details.map(d=>`<li>${d}</li>`).join('')||'<li>有効な入力がありません。分母と観測回数を入力してください。</li>'}</ul>`;
+}
+document.getElementById('calc').addEventListener('click',run);
+</script></body></html>
